@@ -4,7 +4,11 @@ import {colors} from '../variables'
 export default class Player {
   constructor (kill, throwBomb) {
     this.kill = kill
+    this.kills = 0
+    this.bombsUsed = 0
     this.throwBomb = throwBomb
+    this.maxHealth = 10
+    this.health = 10
     this.hitbox = 30 // use int for now, but can use a shape later
     this.windowExtension = 0
     this.invincible = true
@@ -77,13 +81,18 @@ export default class Player {
     context.lineTo(this.crosshair.x, this.crosshair.y)
     context.stroke()
 
+    context.fillStyle = colors.red
+    context.fillRect(this.x, this.y + this.hitbox + 3, this.health / this.maxHealth * this.hitbox, 10)
+    context.strokeStyle = colors.playerOutline
+    context.strokeRect(this.x, this.y + this.hitbox + 3, this.hitbox, 10)
+
   }
 
   update = (context, triangles, powerUps) => {
     if (!this.invincible) {
-      this._checkPowerUpInteractions(powerUps)
       this._checkEnemyInteractions(triangles)
     }
+    this._checkPowerUpInteractions(powerUps)
     this._incrementVelocity()
     this._incrementPosition()
     this._boundryInteraction()
@@ -135,6 +144,8 @@ export default class Player {
     enemies.slice().forEach((e, i) => {
       if (e.alive) {
         if (overlapping(this.getPosition(), e.getPosition())) {
+          this.health--
+          this.kills++
           e.kill()
         }
       }
@@ -142,15 +153,16 @@ export default class Player {
   }
 
   _checkGameOver = () => {
-    if (this.hitbox > window.innerWidth) {
+    if (this.health < 0) {
       this.kill()
     }
   }
 
   _handleClick = (e) => {
     if (this.bombs) {
-      this.throwBomb(this.x + this.hitbox / 2, this.y + this.hitbox / 2, this.crosshair.x, this.crosshair.y)
+      this.throwBomb(this.x + this.hitbox / 2, this.y + this.hitbox / 2, this.crosshair.x, this.crosshair.y, () => this.kills++)
       this.bombs--
+      this.bombsUsed++
     }
   }
 

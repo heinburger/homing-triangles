@@ -26,23 +26,23 @@ const GameOverText = styled.h1`
   margin: 40px 0 10px 0;
 `
 
-const GameOverTime = styled.p`
+const GameOverKills = styled.p`
   font-size: 70px;
-  margin: 0;
+  margin: 0 0 10px 0;
 `
-const GameOverSquares = styled.p`
+const GameOverBombs = styled.p`
   font-size: 30px;
   margin: 0 0 20px 0;
 `
 
 @observer class GameOver extends Component {
   render() {
-    const {gameTime, numberOfSquares} = gameStore
+    const {numberOfKills, numberOfBombsUsed} = gameStore
     return (
       <GameOverDiv>
         <GameOverText>Game over</GameOverText>
-        <GameOverTime>{gameTime}</GameOverTime>
-        <GameOverSquares>{numberOfSquares} squares</GameOverSquares>
+        <GameOverKills>{numberOfKills} kills</GameOverKills>
+        <GameOverBombs>{numberOfBombsUsed} bombs used</GameOverBombs>
         <Form />
         <Next />
         <HighScores />

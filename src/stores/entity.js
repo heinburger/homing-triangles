@@ -16,14 +16,13 @@ class EntityStore {
     this.canvas.height = window.innerHeight
     this.context = this.canvas.getContext('2d')
     this.playerActive = false
-    this.powerUpCounter = 0 // this divided by the modulus gives the number
-    this.powerUpMod= 1000
-    this.initialNumberOfTriangles = 2
+    this.powerUpCounter = 0
+    this.powerUpMod= 300
+    this.initialNumberOfTriangles = 10
     this.startingTriangleSize = 15
     this.startingVelocityXMultiplier = 5
     this.startingVelocityYMultiplier = 2
-    this.addPowerUpChance = 0.005
-    this.addTriangleChance = 0.01
+    this.addTriangleChance = 0.1
   }
 
   @action generate = () => {
@@ -52,8 +51,8 @@ class EntityStore {
     this.canvas.height = window.innerHeight
   }
 
-  throwBomb = (x, y, toX, toY) => {
-    this.bombs.push(new Bomb(x, y, toX, toY))
+  throwBomb = (x, y, toX, toY, onKill) => {
+    this.bombs.push(new Bomb(x, y, toX, toY, onKill))
   }
 
   _generateEntities = () => {

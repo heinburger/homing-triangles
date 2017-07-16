@@ -23,6 +23,10 @@ class GameStore {
     return entityStore.timer.formattedTime
   }
 
+  @computed get numberOfBombsUsed () {
+    return entityStore.player.bombsUsed
+  }
+
   @computed get numberOfKills () {
     return entityStore.player.kills
   }

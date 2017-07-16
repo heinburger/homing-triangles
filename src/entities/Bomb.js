@@ -2,8 +2,9 @@ import {overlapping} from './_utils'
 import {colors} from '../variables'
 
 export default class Bomb {
-  constructor (x, y, toX, toY) {
+  constructor (x, y, toX, toY, onKill) {
     this.alive = true
+    this.onKill = onKill
     this.exploding = false
     this.explodeLength = 500 // ms
     this.hitbox = 30
@@ -87,6 +88,7 @@ export default class Bomb {
           if (!this.exploding) {
             this._explode()
           }
+          this.onKill()
           e.kill()
         }
       }

@@ -15,7 +15,7 @@ export default class Triangle {
   }
 
   draw = (context) => {
-    context.fillStyle = this.color
+    context.fillStyle = colors.blue
     context.fillRect(this.x, this.y, this.side, this.side)
   }
 
