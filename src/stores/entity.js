@@ -3,6 +3,7 @@ import {useStrict, action, observable} from 'mobx'
 import Player from '../entities/Player'
 import Triangle from '../entities/Triangle'
 import PowerUp from '../entities/PowerUp'
+import Bomb from '../entities/Bomb'
 import Timer from '../entities/Timer'
 
 useStrict(true)
@@ -15,7 +16,9 @@ class EntityStore {
     this.canvas.height = window.innerHeight
     this.context = this.canvas.getContext('2d')
     this.playerActive = false
-    this.initialNumberOfTriangles = 0
+    this.powerUpCounter = 0 // this divided by the modulus gives the number
+    this.powerUpMod= 1000
+    this.initialNumberOfTriangles = 2
     this.startingTriangleSize = 15
     this.startingVelocityXMultiplier = 5
     this.startingVelocityYMultiplier = 2
@@ -30,35 +33,12 @@ class EntityStore {
     this.time = 0
     window.cancelAnimationFrame(this.requestId)
     this._generateEntities()
-    this.update()
+    this._update()
   }
 
   @action endGame = () => {
     this.dead = true
     window.cancelAnimationFrame(this.requestId)
-  }
-
-  setCanvasSize = () => {
-    this.canvas.width = window.innerWidth
-    this.canvas.height = window.innerHeight
-  }
-
-  update = () => {
-    this.requestId = window.requestAnimationFrame(this.update)
-    this.context.clearRect(0, 0, window.innerWidth, window.innerHeight)
-    // for (let p of this.powerUps) {
-    //   if (p.alive) { p.update(this.context) }
-    // }
-    // for (let t of this.triangles) {
-    //   if (t.alive) { t.update(this.context, this.player.sick) }
-    // }
-    if (this.playerActive) {
-      this.player.update(this.context, this.squares, this.powerUps)
-    }
-    this.timer.update(this.context)
-
-    this._addRandomPowerUp()
-    // this._addTriangleWave()
   }
 
   start = () => {
@@ -67,34 +47,67 @@ class EntityStore {
     setTimeout(() => this.player.invincible = false, 2000)
   }
 
+  setCanvasSize = () => {
+    this.canvas.width = window.innerWidth
+    this.canvas.height = window.innerHeight
+  }
+
+  throwBomb = (x, y, toX, toY) => {
+    this.bombs.push(new Bomb(x, y, toX, toY))
+  }
+
   _generateEntities = () => {
     this.timer = new Timer()
-    this.player = new Player(this.endGame)
+    this.player = new Player(this.endGame, this.throwBomb)
     this.powerUps = []
+    this.bombs = []
     this.triangles = []
   }
 
-  _addTriangleWave = () => {
+  _update = () => {
+    this.requestId = window.requestAnimationFrame(this._update)
+    this.context.clearRect(0, 0, window.innerWidth, window.innerHeight)
+    for (let p of this.powerUps) {
+      if (p.alive) { p.update(this.context) }
+    }
+    for (let t of this.triangles) {
+      if (t.alive) { t.update(this.context, this.bombs) }
+    }
+    if (this.playerActive) {
+      this.player.update(this.context, this.triangles, this.powerUps)
+    }
+    for (let b of this.bombs) {
+      if (b.alive) { b.update(this.context, this.triangles) }
+    }
+    this.timer.update(this.context)
 
+    this._addPowerUp()
+    if (this.triangles.filter((t) => t.alive).length < 2) {
+      this._addTriangleWave()
+    }
+  }
+
+  _addTriangleWave = () => {
+    this._generateTriangleWave()
   }
 
   _generateTriangleWave = () => {
-    if (!this.triangles) { this.triangles = [] }
     const times = [...Array(this.initialNumberOfTriangles).keys()]
     times.forEach(() => this.triangles.push(this._genereateOneTriangle()))
   }
 
-  _genereateOneTriange = () => {
+  _genereateOneTriangle = () => {
     const side = this.startingTriangleSize
     const x = Math.random() * (window.innerWidth - side)
     const y = Math.random() * (window.innerHeight - side)
-    const dx = (Math.random() - 0.5) * this.startingVelocityXMultiplier
-    const dy = (Math.random() - 0.5) * this.startingVelocityYMultiplier
+    const dx = 0
+    const dy = 0
     return new Triangle(x, y, dx, dy, side)
   }
 
-  _addRandomPowerUp = () => {
-    if (Math.random() < this.addPowerUpChance) {
+  _addPowerUp = () => {
+    this.powerUpCounter++
+    if (this.powerUpCounter % this.powerUpMod === 0) {
       this.powerUps.push(new PowerUp())
     }
   }

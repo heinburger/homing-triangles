@@ -19,12 +19,8 @@ export default class Triangle {
     context.fillRect(this.x, this.y, this.side, this.side)
   }
 
-  update = (context, shouldSpeedUp) => {
-
+  update = (context) => {
     this._incrementPosition()
-    if (shouldSpeedUp) {
-      this._speedUp()
-    }
     this._boundryInteraction()
     this.draw(context)
   }

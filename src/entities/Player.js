@@ -2,12 +2,13 @@ import {overlapping} from './_utils'
 import {colors} from '../variables'
 
 export default class Player {
-  constructor (kill) {
+  constructor (kill, throwBomb) {
     this.kill = kill
+    this.throwBomb = throwBomb
     this.hitbox = 30 // use int for now, but can use a shape later
     this.windowExtension = 0
     this.invincible = true
-    this.sick = false
+    this.bombs = 1
     this.altCount = 0
     this.altMod = 15
     this.x = window.innerWidth / 2 - this.hitbox / 2
@@ -16,14 +17,13 @@ export default class Player {
     this.dy = 0
     this.velocity = 9
     this.acceleration = 1
-    this.accelerationIntervaleTime = 10 // ms
     this.accelerationMap = {
       up: false,
       right: false,
       down: false,
       left: false
     }
-    this.decelerationIntervalTime = 20 // ms
+    this.decelerationIntervalTime = 25 // ms
     this.decelerationIntervalIds = {
       up: undefined,
       right: undefined,
@@ -44,6 +44,7 @@ export default class Player {
       y: -300 // start off screen
     }
 
+    document.addEventListener('click', this._handleClick)
     document.addEventListener('keydown', this._handleKeyDown)
     document.addEventListener('keyup', this._handleKeyUp)
     document.addEventListener('mousemove', this._handleMouseMove)
@@ -61,6 +62,7 @@ export default class Player {
     context.fillRect(this.x, this.y, this.hitbox, this.hitbox)
     context.strokeStyle = colors.playerOutline
     context.strokeRect(this.x, this.y, this.hitbox, this.hitbox)
+    context.strokeText(this.bombs, this.x + this.hitbox / 3.2, this.y + this.hitbox / 1.3, this.hitbox)
 
     context.strokeStyle = colors.secondary
     context.beginPath()
@@ -70,12 +72,17 @@ export default class Player {
     context.lineTo(this.crosshair.x, this.crosshair.y - this.crosshair.size / 2)
     context.stroke()
 
+    context.beginPath()
+    context.moveTo(this.x + this.hitbox / 2, this.y + this.hitbox / 2)
+    context.lineTo(this.crosshair.x, this.crosshair.y)
+    context.stroke()
+
   }
 
-  update = (context, squares, powerUps) => {
-    this.sick = false
+  update = (context, triangles, powerUps) => {
     if (!this.invincible) {
       this._checkPowerUpInteractions(powerUps)
+      this._checkEnemyInteractions(triangles)
     }
     this._incrementVelocity()
     this._incrementPosition()
@@ -115,14 +122,20 @@ export default class Player {
 
   _checkPowerUpInteractions = (powerUps) => {
     powerUps.slice().forEach((p, i) => {
-      if (overlapping(this.getPosition(), p.getPosition())) {
-        if (p.alive) {
-          if (p.poison) {
-            this.sick = true
-          } else {
-            this.growing -= 1
-          }
+      if (p.alive) {
+        if (overlapping(this.getPosition(), p.getPosition())) {
+          this.bombs++
           p.kill()
+        }
+      }
+    })
+  }
+
+  _checkEnemyInteractions = (enemies) => {
+    enemies.slice().forEach((e, i) => {
+      if (e.alive) {
+        if (overlapping(this.getPosition(), e.getPosition())) {
+          e.kill()
         }
       }
     })
@@ -131,6 +144,13 @@ export default class Player {
   _checkGameOver = () => {
     if (this.hitbox > window.innerWidth) {
       this.kill()
+    }
+  }
+
+  _handleClick = (e) => {
+    if (this.bombs) {
+      this.throwBomb(this.x + this.hitbox / 2, this.y + this.hitbox / 2, this.crosshair.x, this.crosshair.y)
+      this.bombs--
     }
   }
 
