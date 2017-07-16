@@ -15,12 +15,12 @@ export const StyledButton = styled.button`
   white-space: normal;
   &:hover {
     color: ${props => props.primary ? colors.white : colors.text};
-    background-color: ${props => props.primary ? colors.purple : colors.gray};
+    background-color: ${props => props.primary ? colors.red : colors.gray};
     border-color: ${props => props.primary ? colors.red : colors.white}
   }
   &:focus {
     color: ${props => props.primary ? colors.white : colors.white};
-    background-color: ${props => props.primary ? colors.purple : colors.gray};
+    background-color: ${props => props.primary ? colors.red : colors.gray};
   }
   &:disabled {
     cursor: not-allowed;

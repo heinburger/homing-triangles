@@ -8,22 +8,19 @@ import {colors} from '../../variables'
 import {StyledButton} from '../Styled'
 
 const InstructionsDiv = styled.div`
-  position: fixed;
-  top: 20%;
   font-size: larger;
-  right: 20%;
-  left: 20%;
-  box-shadow: 0px 1px 5px 5px rgba(0, 0, 0, 0.05);
-  border: 1px solid ${colors.gray};
   text-align: center;
   padding: 10px 30px 40px;
   color: ${colors.text};
-  background: ${colors.secondary};
+  background: none;
 `
 
 const StyledTitle = styled.h2`
-  color: ${colors.green},
-  font-size: 40px;
+  color: ${colors.green};
+  text-shadow: 1px 3px 0 ${colors.text};
+  line-height: 75px;
+  margin-bottom: 20px;
+  font-size: 80px;
 `
 
 @observer class Instructions extends Component {
@@ -32,7 +29,7 @@ const StyledTitle = styled.h2`
     return (
       <InstructionsDiv>
         <StyledTitle>homing triangles</StyledTitle>
-        <p>shoot the homing triangles</p>
+        <p>shoot the homing triangles. W, A, S, D to move. click to fire bombs</p>
         <StyledButton primary onClick={onStartGameClick}>start</StyledButton>
       </InstructionsDiv>
     )

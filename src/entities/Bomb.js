@@ -7,13 +7,14 @@ export default class Bomb {
     this.onKill = onKill
     this.exploding = false
     this.explodeLength = 500 // ms
-    this.hitbox = 30
+    this.hitbox = 15
+    this.getRadius = () => (this.hitbox + this.hitbox * 0.2) / 2
     this.hitboxSwellIncrement = 3
     this.hitboxMax = 100
     this.windowExtension = 0
     this.altCount = 0
     this.altMod = 15
-    this.velocity = 30
+    this.velocity = 10
     this.distance = Math.sqrt(Math.abs(toY - y) * Math.abs(toY - y) + Math.abs(toX - x) * Math.abs(toX - x))
     this.x = x - this.hitbox / 2
     this.y = y - this.hitbox / 2
@@ -33,9 +34,11 @@ export default class Bomb {
     } else {
       context.fillStyle = colors.black
     }
-    context.fillRect(this.x, this.y, this.hitbox, this.hitbox)
+    context.beginPath()
     context.strokeStyle = colors.yellow
-    context.strokeRect(this.x, this.y, this.hitbox, this.hitbox)
+    context.arc(this.x + this.hitbox / 2, this.y + this.hitbox / 2, this.getRadius(), 0, Math.PI * 2)
+    context.fill()
+    context.stroke()
   }
 
   update = (context, triangles) => {
@@ -56,6 +59,10 @@ export default class Bomb {
     }
   }
 
+  kill = () => {
+    this.alive = false
+  }
+
   _incrementPosition = () => {
     this.x += this.dx
     this.y += this.dy
@@ -69,7 +76,7 @@ export default class Bomb {
   _explode = () => {
     this.dx = 0
     this.dy = 0
-    setTimeout(() => this.alive = false, this.explodeLength)
+    setTimeout(this.kill, this.explodeLength)
     this.exploding = true
   }
 
@@ -83,14 +90,12 @@ export default class Bomb {
 
   _checkEnemyInteractions = (enemies) => {
     enemies.slice().forEach((e, i) => {
-      if (e.alive) {
-        if (overlapping(this.getPosition(), e.getPosition())) {
-          if (!this.exploding) {
-            this._explode()
-          }
-          this.onKill()
-          e.kill()
+      if (overlapping(this.getPosition(), e.getPosition())) {
+        if (!this.exploding) {
+          this._explode()
         }
+        this.onKill()
+        e.kill()
       }
     })
   }

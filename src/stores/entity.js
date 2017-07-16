@@ -17,20 +17,21 @@ class EntityStore {
     this.context = this.canvas.getContext('2d')
     this.playerActive = false
     this.powerUpCounter = 0
-    this.powerUpMod= 300
-    this.initialNumberOfTriangles = 10
+    this.powerUpMod= 200
     this.startingTriangleSize = 15
     this.startingVelocityXMultiplier = 5
     this.startingVelocityYMultiplier = 2
     this.addTriangleChance = 0.1
     this.triangleWaveNumber = 1
+    this.initialNumberOfTriangles = 30
+    this.maxBombs = 9
   }
 
   @action generate = () => {
     this.setCanvasSize()
     this.playerActive = false
     this.dead = false
-    this.time = 0
+    this.triangleWaveNumber = 1
     window.cancelAnimationFrame(this.requestId)
     this._generateEntities()
     this._update()
@@ -67,24 +68,32 @@ class EntityStore {
   _update = () => {
     this.requestId = window.requestAnimationFrame(this._update)
     this.context.clearRect(0, 0, window.innerWidth, window.innerHeight)
+    this._cleanUpDeadEntities()
     for (let p of this.powerUps) {
-      if (p.alive) { p.update(this.context) }
+      p.update(this.context)
     }
     for (let t of this.triangles) {
-      if (t.alive) { t.update(this.context, this.player) }
+      t.update(this.context, this.triangles, this.player)
     }
     if (this.playerActive) {
       this.player.update(this.context, this.triangles, this.powerUps)
     }
     for (let b of this.bombs) {
-      if (b.alive) { b.update(this.context, this.triangles) }
+      b.update(this.context, this.triangles)
     }
     this.timer.update(this.context)
-
-    this._addPowerUp()
-    if (this.triangles.filter((t) => t.alive).length === 0) {
+    if (this.powerUps.length + this.player.bombs < this.maxBombs) {
+      this._addPowerUp()
+    }
+    if (this.triangles.length === 0) {
       this._addTriangleWave()
     }
+  }
+
+  _cleanUpDeadEntities = () => {
+    this.triangles = this.triangles.filter((t) => t.alive)
+    this.powerUps = this.powerUps.filter((p) => p.alive)
+    this.bombs = this.bombs.filter((b) => b.alive)
   }
 
   _addTriangleWave = () => {
@@ -98,9 +107,14 @@ class EntityStore {
   }
 
   _genereateOneTriangle = () => {
+    const edge = Math.random() * 4
     const size = this.startingTriangleSize
-    const x = Math.random() * (window.innerWidth - size)
-    const y = Math.random() * (window.innerHeight - size)
+    const x = edge < 2
+      ? Math.random() * (window.innerWidth - size)
+      : Math.floor(Math.random() * 2) * window.innerWidth
+    const y = edge >= 2
+      ? Math.random() * (window.innerHeight - size)
+      : Math.floor(Math.random() * 2) * window.innerHeight
     const dx = 0
     const dy = 0
     return new Triangle(x, y, dx, dy, size)

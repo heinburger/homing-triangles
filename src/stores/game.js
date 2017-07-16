@@ -7,11 +7,9 @@ useStrict(true)
 class GameStore {
   @observable name = ''
   @observable showGameOver = false
-  @observable showInstructions = false
+  @observable showInstructions = true
 
   constructor () {
-    entityStore.generate()
-    this.startGame()
     autorun(() => {
       if (entityStore.dead) {
         this.endGame()
@@ -62,8 +60,6 @@ class GameStore {
   @action onInstructionsClick = () => {
     this.showInstructions = true
     this.showGameOver = false
-    highScoreStore.scoreAccepted = false
-    entityStore.generate()
   }
 
   @action onStartGameClick = () => {

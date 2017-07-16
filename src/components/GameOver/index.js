@@ -21,13 +21,16 @@ const GameOverDiv = styled.div`
 `
 
 const GameOverText = styled.h1`
-  color: ${colors.red};
+  color: ${colors.orange};
+  text-shadow: 1px 1px 0 ${colors.red};
+  line-height: 60px;
+  margin-bottom: 10px;
   font-size: 50px;
-  margin: 40px 0 10px 0;
+  margin: 40px 0 20px 0;
 `
 
 const GameOverKills = styled.p`
-  font-size: 70px;
+  font-size: 40px;
   margin: 0 0 10px 0;
 `
 const GameOverBombs = styled.p`

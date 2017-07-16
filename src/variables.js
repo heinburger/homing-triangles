@@ -19,5 +19,5 @@ export const colors = {
   // gray scale
   white: '#FFFFFF',
   gray: '#EEEEEE',
-  black: '#000000'
+  black: '#444444'
 }

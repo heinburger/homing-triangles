@@ -1,5 +1,5 @@
 import {colors} from '../variables'
-import {rotate} from './_utils'
+import {rotate, overlapping} from './_utils'
 
 export default class Triangle {
   constructor (x, y, dx, dy, size) {
@@ -18,6 +18,8 @@ export default class Triangle {
     this.color = colors.lighterBlue
     this.speedUpMultiplier = 1.75
     this.speedUpLength = 5000 // ms
+    this.chosenAdjustX = 0
+    this.chosenAdjustY = 0
   }
 
   draw = (context) => {
@@ -29,6 +31,7 @@ export default class Triangle {
 
     context.strokeStyle = colors.playerOutline
     context.fillStyle = colors.blue
+    context.lineWidth = 2
     context.beginPath()
     context.moveTo(nx, ny)
     context.lineTo(nx1, ny1)
@@ -38,10 +41,10 @@ export default class Triangle {
     context.fill()
   }
 
-  update = (context, player) => {
+  update = (context, triangles, player) => {
     this._adjustTo(player)
+    this._boundryInteraction(triangles)
     this._incrementPosition()
-    this._boundryInteraction()
     this.draw(context)
   }
 
@@ -69,31 +72,28 @@ export default class Triangle {
     this.dy = (toY - y) / this.distance * this.velocity
   }
 
-  _boundryInteraction = () => {
-    if (this.x + this.size > window.innerWidth + this.windowExtension) {
-      this.x = window.innerWidth + this.windowExtension - this.size
-      this.dx = -this.dx
-    }
-
-    if (this.x + this.windowExtension < 0) {
-      this.x = 0 - this.windowExtension
-      this.dx = -this.dx
-    }
-
-    if (this.y + this.size > window.innerHeight + this.windowExtension) {
-      this.y = window.innerHeight + this.windowExtension - this.size
-      this.dy = -this.dy
-    }
-
-    if (this.y + this.windowExtension < 0) {
-      this.y = 0 - this.windowExtension
-      this.dy = -this.dy
+  _boundryInteraction = (triangles) => {
+    const index = triangles.indexOf(this)
+    let overlap = false
+    triangles.slice().forEach((t, i) => {
+      if (i !== index && overlapping(this.getPosition(), t.getPosition())) {
+        overlap = true
+      }
+    })
+    if (overlap) {
+      if (!this.chosenAdjustX && !this.chosenAdjustY) {
+        this.chosenAdjustX = (Math.random() - 0.5) * this.velocity
+        this.chosenAdjustY = (Math.random() - 0.5) * this.velocity
+      }
+    } else {
+      this.chosenAdjustX = 0
+      this.chosenAdjustY = 0
     }
   }
 
   _incrementPosition = () => {
-    this.x += this.dx
-    this.y += this.dy
+    this.x += this.dx + this.chosenAdjustX
+    this.y += this.dy + this.chosenAdjustY
   }
 
   // _speedUp = () => {

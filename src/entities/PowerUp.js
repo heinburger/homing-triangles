@@ -2,7 +2,8 @@ import {colors} from '../variables'
 
 export default class PowerUp {
   constructor () {
-    this.size = 20
+    this.size = 15
+    this.getRadius = () => (this.size + this.size * 0.2) / 2
     this.x = window.innerWidth * Math.random() - this.size
     this.y = window.innerHeight * Math.random() - this.size
     this.alive = true
@@ -11,24 +12,12 @@ export default class PowerUp {
   }
 
   draw = (context) => {
-    context.strokeStyle = colors.blue
-    context.strokeWeight = 1
-    context.lineWidth = 2.0
     context.fillStyle = colors.black
-    const x = this.x
-    const y = this.y
-    const w = this.size
-    const h = this.size
-
     context.beginPath()
-    context.moveTo(x + w/2, y + h/2)
-    context.quadraticCurveTo(x + w/6, y, x, y + h/2)
-    context.lineTo(x + w/2, y + h)
-    context.lineTo(x + w, y + h/2)
-    context.quadraticCurveTo(x + w * 5/6, y, x + w/2, y + h/2)
-    context.closePath()
-    context.stroke()
+    context.strokeStyle = colors.yellow
+    context.arc(this.x + this.size / 2, this.y + this.size / 2, this.getRadius(), 0, Math.PI * 2)
     context.fill()
+    context.stroke()
   }
 
   update = (context) => {

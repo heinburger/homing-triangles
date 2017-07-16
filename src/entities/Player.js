@@ -74,11 +74,7 @@ export default class Player {
     context.lineTo(this.crosshair.x - this.crosshair.size / 2, this.crosshair.y)
     context.moveTo(this.crosshair.x, this.crosshair.y + this.crosshair.size / 2)
     context.lineTo(this.crosshair.x, this.crosshair.y - this.crosshair.size / 2)
-    context.stroke()
-
-    context.beginPath()
-    context.moveTo(this.x + this.hitbox / 2, this.y + this.hitbox / 2)
-    context.lineTo(this.crosshair.x, this.crosshair.y)
+    context.closePath()
     context.stroke()
 
     context.fillStyle = colors.red
@@ -155,6 +151,10 @@ export default class Player {
   _checkGameOver = () => {
     if (this.health < 0) {
       this.kill()
+      document.removeEventListener('click', this._handleClick)
+      document.removeEventListener('keydown', this._handleKeyDown)
+      document.removeEventListener('keyup', this._handleKeyUp)
+      document.removeEventListener('mousemove', this._handleMouseMove)
     }
   }
 
