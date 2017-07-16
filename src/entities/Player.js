@@ -16,14 +16,14 @@ export default class Player {
     this.dy = 0
     this.velocity = 9
     this.acceleration = 1
-    this.accelerationIntervaleTime = 50 // ms
-    this.accelerationIntervalIds = {
-      up: undefined,
-      right: undefined,
-      down: undefined,
-      left: undefined
+    this.accelerationIntervaleTime = 10 // ms
+    this.accelerationMap = {
+      up: false,
+      right: false,
+      down: false,
+      left: false
     }
-    this.decelerationIntervalTime = 50 // ms
+    this.decelerationIntervalTime = 20 // ms
     this.decelerationIntervalIds = {
       up: undefined,
       right: undefined,
@@ -77,8 +77,8 @@ export default class Player {
     if (!this.invincible) {
       this._checkPowerUpInteractions(powerUps)
     }
-    this.x += this.dx
-    this.y += this.dy
+    this._incrementVelocity()
+    this._incrementPosition()
     this._boundryInteraction()
     this.draw(context)
     this._checkGameOver()
@@ -91,6 +91,26 @@ export default class Player {
       right: this.x + this.hitbox,
       bottom: this.y + this.hitbox
     }
+  }
+
+  _incrementVelocity = () => {
+    if (this.accelerationMap.up && this.dy >= -this.velocity && !(this.dy - this.acceleration < -this.velocity)) {
+      this.dy -= this.acceleration
+    }
+    if (this.accelerationMap.right && this.dx <= this.velocity && !(this.dx + this.acceleration > this.velocity)) {
+      this.dx += this.acceleration
+    }
+    if (this.accelerationMap.down && this.dy <= this.velocity && !(this.dy + this.acceleration > this.velocity)) {
+      this.dy += this.acceleration
+    }
+    if (this.accelerationMap.left && this.dx >= -this.velocity && !(this.dx - this.acceleration < -this.velocity)) {
+      this.dx -= this.acceleration
+    }
+  }
+
+  _incrementPosition = () => {
+    this.x += this.dx
+    this.y += this.dy
   }
 
   _checkPowerUpInteractions = (powerUps) => {
@@ -122,48 +142,16 @@ export default class Player {
   _handleKeyDown = (e) => {
     switch (e.keyCode) {
       case this.controlMap.up:
-        if (this.dy >= -this.velocity) {
-          this._speedUpInterval('up', () => {
-            if (this.dy - this.acceleration < -this.velocity) {
-              clearInterval(this.accelerationIntervalIds.up)
-            } else {
-              this.dy -= this.acceleration
-            }
-          })
-        }
+        this.accelerationMap.up = true
         break
       case this.controlMap.right:
-        if (this.dx <= this.velocity) {
-          this._speedUpInterval('right', () => {
-            if (this.dx + this.acceleration > this.velocity) {
-              clearInterval(this.accelerationIntervalIds.right)
-            } else {
-              this.dx += this.acceleration
-            }
-          })
-        }
+        this.accelerationMap.right = true
         break
       case this.controlMap.down:
-        if (this.dy <= this.velocity) {
-          this._speedUpInterval('down', () => {
-            if (this.dy + this.acceleration > this.velocity) {
-              clearInterval(this.accelerationIntervalIds.down)
-            } else {
-              this.dy += this.acceleration
-            }
-          })
-        }
+        this.accelerationMap.down = true
         break
       case this.controlMap.left:
-        if (this.dx >= -this.velocity) {
-          this._speedUpInterval('left', () => {
-            if (this.dx - this.acceleration < -this.velocity) {
-              clearInterval(this.accelerationIntervalIds.left)
-            } else {
-              this.dx -= this.acceleration
-            }
-          })
-        }
+        this.accelerationMap.left = true
         break
       case this.controlMap.use:
         // not sure yet
@@ -176,6 +164,7 @@ export default class Player {
   _handleKeyUp = (e) => {
     switch (e.keyCode) {
       case this.controlMap.up:
+        this.accelerationMap.up = false
         if (this.dy < 0) {
           this._slowDownInterval('up', () => {
             if (this.dy + this.acceleration > 0) {
@@ -187,6 +176,7 @@ export default class Player {
         }
         break
       case this.controlMap.right:
+        this.accelerationMap.right = false
         if (this.dx > 0) {
           this._slowDownInterval('right', () => {
             if (this.dx - this.acceleration < 0) {
@@ -198,6 +188,7 @@ export default class Player {
         }
         break
       case this.controlMap.down:
+        this.accelerationMap.down = false
         if (this.dy > 0) {
           this._slowDownInterval('down', () => {
             if (this.dy - this.acceleration < 0) {
@@ -209,6 +200,7 @@ export default class Player {
         }
         break
       case this.controlMap.left:
+        this.accelerationMap.left = false
         if (this.dx < 0) {
           this._slowDownInterval('left', () => {
             if (this.dx + this.acceleration > 0) {
@@ -235,39 +227,27 @@ export default class Player {
     )
   }
 
-  _speedUpInterval = (direction, fn) => {
-    clearInterval(this.accelerationIntervalIds[direction])
-    this.accelerationIntervalIds[direction] = setInterval(
-      fn,
-      this.accelerationIntervalTime
-    )
-  }
-
   _boundryInteraction = () => {
     if (this.x + this.hitbox > window.innerWidth + this.windowExtension) {
       clearInterval(this.decelerationIntervalIds.left)
-      clearInterval(this.accelerationIntervalIds.right)
       this.x = window.innerWidth + this.windowExtension - this.hitbox
       this.dx = 0
     }
 
     if (this.x + this.windowExtension < 0) {
       clearInterval(this.decelerationIntervalIds.right)
-      clearInterval(this.accelerationIntervalIds.left)
       this.x = 0 - this.windowExtension
       this.dx = 0
     }
 
     if (this.y + this.hitbox > window.innerHeight + this.windowExtension) {
       clearInterval(this.decelerationIntervalIds.up)
-      clearInterval(this.accelerationIntervalIds.down)
       this.y = window.innerHeight + this.windowExtension - this.hitbox
       this.dy = 0
     }
 
     if (this.y + this.windowExtension < 0) {
       clearInterval(this.decelerationIntervalIds.down)
-      clearInterval(this.accelerationIntervalIds.up)
       this.y = 0 - this.windowExtension
       this.dy = 0
     }

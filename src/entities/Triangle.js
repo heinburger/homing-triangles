@@ -20,11 +20,12 @@ export default class Triangle {
   }
 
   update = (context, shouldSpeedUp) => {
-    this._boundryInteraction()
+
     this._incrementPosition()
     if (shouldSpeedUp) {
       this._speedUp()
     }
+    this._boundryInteraction()
     this.draw(context)
   }
 
