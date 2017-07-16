@@ -8,12 +8,11 @@ export default class Timer {
     this.formattedTime = formatTime(0)
     this.x = window.innerWidth / 2 - this.width / 2
     this.y = 30
-    this.color = colors.lighterBlue
   }
 
   draw = (context) => {
     context.font = '22px serif'
-    context.fillStyle = this.color
+    context.fillStyle = colors.text
     context.fillText(this.formattedTime, this.x, this.y, this.width);
   }
 

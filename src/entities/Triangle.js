@@ -20,7 +20,7 @@ export default class Triangle {
   }
 
   update = (context, shouldSpeedUp) => {
-    this._boundryInteratction()
+    this._boundryInteraction()
     this._incrementPosition()
     if (shouldSpeedUp) {
       this._speedUp()
@@ -41,7 +41,7 @@ export default class Triangle {
     this.alive = false
   }
 
-  _boundryInteratction = () => {
+  _boundryInteraction = () => {
     if (this.x + this.side > window.innerWidth + this.windowExtension) {
       this.x = window.innerWidth + this.windowExtension - this.side
       this.dx = -this.dx

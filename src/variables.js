@@ -3,6 +3,11 @@ export const colors = {
   secondary: '#959ea6',
   text: '#146883',
 
+  // player
+  playerColor: '#a5fd32',
+  playerInvincibleAlternate: '#75bd32',
+  playerOutline: '#146883',
+
   // accents
   green: '#a5fd32',
   red: '#fb4348',

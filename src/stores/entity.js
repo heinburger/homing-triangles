@@ -46,12 +46,12 @@ class EntityStore {
   update = () => {
     this.requestId = window.requestAnimationFrame(this.update)
     this.context.clearRect(0, 0, window.innerWidth, window.innerHeight)
-    for (let p of this.powerUps) {
-      if (p.alive) { p.update(this.context) }
-    }
-    for (let s of this.squares) {
-      if (s.alive) { s.update(this.context, this.player.sick) }
-    }
+    // for (let p of this.powerUps) {
+    //   if (p.alive) { p.update(this.context) }
+    // }
+    // for (let t of this.triangles) {
+    //   if (t.alive) { t.update(this.context, this.player.sick) }
+    // }
     if (this.playerActive) {
       this.player.update(this.context, this.squares, this.powerUps)
     }
