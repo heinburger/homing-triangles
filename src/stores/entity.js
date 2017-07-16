@@ -103,7 +103,7 @@ class EntityStore {
     const y = Math.random() * (window.innerHeight - size)
     const dx = 0
     const dy = 0
-    return new Triangle(x, y, dx, dy, size,)
+    return new Triangle(x, y, dx, dy, size)
   }
 
   _addPowerUp = () => {
