@@ -16,3 +16,11 @@ export const formatTime = (time) => { // ms
   const ms = time % 1000
   return `${_padZero(min, 2)}:${_padZero(sec, 2)}:${_padZero(ms, 3)}`
 }
+
+export const rotate = (cx, cy, x, y, rads) => {
+    const cos = Math.cos(rads)
+    const sin = Math.sin(rads)
+    const nx = (cos * (x - cx)) + (sin * (y - cy)) + cx
+    const ny = (cos * (y - cy)) - (sin * (x - cx)) + cy
+    return [nx, ny]
+}
